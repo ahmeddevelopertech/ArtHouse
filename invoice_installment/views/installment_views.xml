@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Installment Form View -->
+    <record id="view_installment_form" model="ir.ui.view">
+        <field name="name">account.move.installment.form</field>
+        <field name="model">account.move.installment</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_mark_as_paid"
+                            string="Mark as Paid"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state == 'paid'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,due,paid,overdue"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="move_id" readonly="1"/>
+                        <field name="partner_id" readonly="1"/>
+                        <field name="due_date" readonly="1"/>
+                        <field name="amount" readonly="1"/>
+                        <field name="payment_id" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Installment Tree View -->
+    <record id="view_installment_tree" model="ir.ui.view">
+        <field name="name">account.move.installment.tree</field>
+        <field name="model">account.move.installment</field>
+        <field name="arch" type="xml">
+            <tree string="Installments">
+                <field name="due_date"/>
+                <field name="partner_id" string="Customer"/>
+                <field name="amount" widget="monetary"
+                       options="{'currency_field': 'currency_id'}"/>
+                <field name="state" widget="badge"
+                       options="{'classes': {'draft': 'default', 'due': 'warning', 'paid': 'success', 'overdue': 'danger'}}"/>
+                <field name="payment_id" widget="many2one"/>
+                <button name="action_mark_as_paid"
+                        string="Mark as Paid"
+                        type="object"
+                        class="btn-primary"
+                        icon="fa-money"
+                        invisible="state == 'paid'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Installment Calendar View -->
+    <record id="view_installment_calendar" model="ir.ui.view">
+        <field name="name">account.move.installment.calendar</field>
+        <field name="model">account.move.installment</field>
+        <field name="arch" type="xml">
+            <calendar string="Installments Calendar" date_start="due_date" color="state">
+                <field name="due_date"/>
+                <field name="state"/>
+                <field name="display_name"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Installment Action -->
+    <record id="action_installment_view" model="ir.actions.act_window">
+        <field name="name">Installments</field>
+        <field name="res_model">account.move.installment</field>
+        <field name="view_mode">calendar,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No installments found. Create installments on customer invoices.
+            </p>
+        </field>
+    </record>
+
+    <!-- Add to Accounting menu -->
+    <menuitem id="menu_installment" name="Installments"
+              parent="account.menu_finance" action="action_installment_view"/>
+</odoo>

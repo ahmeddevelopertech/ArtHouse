@@ -1,0 +1,32 @@
+<odoo>
+    <record id="view_company_form_inherit" model="ir.ui.view">
+        <field name="name">res.company.form.inherit</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='oe_title']" position="after">
+                <div class="mt16 border-top pt16">
+                    <h2 class="mb-3">Inter-Company Settings</h2>
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="inter_company_clearing_account_id" class="o_form_label fw-bold"/>
+                            <field name="inter_company_clearing_account_id"
+                                   class="o_input o_field_widget w-100"/>
+                            <small class="text-muted d-block mt-1">
+                                Account used for cash transfers between branches
+                            </small>
+
+                            <label for="counterpart_company_id" class="o_form_label fw-bold mt-3"/>
+                            <field name="counterpart_company_id"
+                                   class="o_input o_field_widget w-100"/>
+
+                            <label for="counterpart_account_id" class="o_form_label fw-bold mt-3"/>
+                            <field name="counterpart_account_id"
+                                   class="o_input o_field_widget w-100"/>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
