@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_account_move_custom_simplified">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page"
+                     style="direction: ltr; font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                    <div class="oe_structure"/>
+
+                    <!-- Header section with company information -->
+                    <div class="row" style="border-bottom: 1px solid #dee2e6; padding-bottom: 15px;">
+                        <div class="text-center">
+                            <h3 style="color: #0d6efd; font-weight: bold;">Payment Voucher</h3>
+                            <p style="margin-top: 5px; color: #6c757d;">Voucher No:
+                                <span t-field="docs[0].name"/>
+                            </p>
+                            <p>Date:
+                                <span t-field="docs[0].date" t-options='{"widget": "date"}'/>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Branch information (for multi-branch systems) -->
+                    <t t-if="docs[0].company_id.parent_id">
+                        <div class="alert alert-info"
+                             style="margin: 15px 0; padding: 8px 15px; background-color: #e7f3ff; border-radius: 4px;">
+                            <i class="fa fa-building" style="margin-right: 5px;"/>
+                            This entry is recorded at branch:
+                            <strong t-field="docs[0].company_id.name"/>
+                        </div>
+                    </t>
+
+                    <!-- Basic data section -->
+                    <div class="row mt-3">
+                        <div class="col-6">
+                            <div class="card" style="border: 1px solid #dee2e6; border-radius: 4px; padding: 15px;">
+                                <strong style="display: block; margin-bottom: 8px; color: #495057;">Amount Paid:</strong>
+                                <h2 class="text-danger" style="font-size: 28px; font-weight: bold; margin: 0;">
+                                    <span t-esc="sum(docs[0].line_ids.mapped('debit'))"
+                                          style="font-family: 'Courier New', monospace;"/>
+                                    EGP
+                                </h2>
+                                <p style="margin-top: 10px; color: #6c757d; font-size: 14px;">
+                                    <t t-if="docs[0].amount_total_words" t-esc="docs[0].amount_total_words"/>
+                                    <t t-if="not docs[0].amount_total_words">Amount in words</t>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card" style="border: 1px solid #dee2e6; border-radius: 4px; padding: 15px;">
+                                <strong style="display: block; margin-bottom: 8px; color: #495057;">Reason:</strong>
+                                <p style="margin: 0; line-height: 1.6;">
+                                    <t t-if="docs[0].line_ids[0].name" t-esc="docs[0].line_ids[0].name"/>
+                                </p>
+                                <t t-if="docs[0].ref">
+                                    <p style="margin-top: 15px; color: #6c757d;">
+                                        Additional Reference:
+                                        <strong t-field="docs[0].ref"/>
+                                    </p>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recipient details -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card" style="border: 1px solid #dee2e6; border-radius: 4px; padding: 15px;">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <strong style="display: block; margin-bottom: 8px; color: #495057;">Recipient:</strong>
+                                        <p style="margin: 0;" t-field="docs[0].line_ids.partner_id"/>
+                                        <p style="margin: 0; color: #6c757d;" t-if="docs[0].partner_id.vat">Tax ID:
+                                            <span t-field="docs[0].partner_id.vat"/>
+                                        </p>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <strong style="display: block; margin-bottom: 8px; color: #495057;">Attached Document:</strong>
+                                        <p style="margin: 0;">
+                                            <t t-if="docs[0].line_ids.filtered(lambda l: l.account_id.code.startswith('120'))">
+                                                Invoice
+                                            </t>
+                                            <t t-if="not docs[0].line_ids.filtered(lambda l: l.account_id.code.startswith('120')) and docs[0].line_ids.filtered(lambda l: l.account_id.code.startswith('210'))">
+                                                Receipt
+                                            </t>
+                                            <t t-if="not docs[0].line_ids.filtered(lambda l: l.account_id.code.startswith('120')) and not docs[0].line_ids.filtered(lambda l: l.account_id.code.startswith('210'))">
+                                                Financial Document
+                                            </t>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Signature section (without Financial Auditor) -->
+                    <div class="border-top mt-4 pt-3" style="border-top: 1px solid #dee2e6 !important;">
+                        <div class="row">
+                            <div class="col-6 text-center">
+                                <p style="height: 60px; border-bottom: 1px solid #dee2e6; margin-bottom: 5px;"></p>
+                                <p style="margin: 0; font-weight: bold;">Accountant</p>
+                            </div>
+                            <div class="col-6 text-center">
+                                <p style="height: 60px; border-bottom: 1px solid #dee2e6; margin-bottom: 5px;"></p>
+                                <p style="margin: 0; font-weight: bold;">Administrative Approval</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional information at the bottom -->
+                    <div class="mt-4"
+                         style="border-top: 1px solid #dee2e6; padding-top: 10px; color: #6c757d; font-size: 12px; text-align: center;">
+                        <p style="margin: 5px 0 0;">
+                            <small>Created on:
+                                <t t-esc="time.strftime('%Y-%m-%d %H:%M:%S')"/>
+                            </small>
+                        </p>
+                    </div>
+
+                    <div class="oe_structure"/>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

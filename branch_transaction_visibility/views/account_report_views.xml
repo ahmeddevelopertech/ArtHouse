@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- تعديل شاشة العميل لإضافة زر لفتح تقرير دفتر الأستاذ -->
+    <record id="view_partner_form_inherit_ledger_button" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.ledger.button</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <button name="action_partner_ledger"
+                        type="object"
+                        title="Partner Ledger Across Branches"
+                        class="btn btn-primary">
+                    <i class="fa fa-book" role="img" aria-label="Ledger"/>
+                    <span> Ledger Across Branches</span>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

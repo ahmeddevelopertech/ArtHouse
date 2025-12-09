@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="group_cash_transfer_manager" model="res.groups">
+            <field name="name">Cash Transfer Manager</field>
+            <!-- ⚠️ التصنيف الصحيح لأودو 17 هو module_category_accounting -->
+            <field name="category_id" ref="base.module_category_accounting"/>
+            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+    </data>
+</odoo>

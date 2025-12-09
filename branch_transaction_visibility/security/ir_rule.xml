@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Rule to allow accountants to see ALL journal entries across branches -->
+    <record id="rule_accountant_see_all_account_moves" model="ir.rule">
+        <field name="name">Accountant: See All Journal Entries Across Branches</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('account.group_account_user'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1"/>
+    </record>
+
+    <!-- Rule to allow accountants to see ALL journal entry lines across branches -->
+    <record id="rule_accountant_see_all_account_move_lines" model="ir.rule">
+        <field name="name">Accountant: See All Journal Entry Lines Across Branches</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('account.group_account_user'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1"/>
+    </record>
+
+    <!-- Rule to allow accountants to see ALL sales orders across branches -->
+    <record id="rule_accountant_see_all_sales_orders" model="ir.rule">
+        <field name="name">Accountant: See All Sales Orders Across Branches</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('account.group_account_user'))]"/>
+          <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1"/>
+    </record>
+
+    <!-- Rule to allow accountants to see ALL payments across branches -->
+    <record id="rule_accountant_see_all_payments" model="ir.rule">
+        <field name="name">Accountant: See All Payments Across Branches</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('account.group_account_user'))]"/>
+          <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1"/>
+    </record>
+
+    <!-- Rule to allow accountants to see all partner transactions -->
+    <record id="rule_accountant_see_all_partner_transactions" model="ir.rule">
+        <field name="name">Accountant: See All Partner Transactions</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('account.group_account_user'))]"/>
+          <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1"/>
+    </record>
+</odoo>

@@ -1,0 +1,47 @@
+<odoo>
+    <!-- 2. تعريف الفورم -->
+    <record id="view_cash_transfer_form" model="ir.ui.view">
+        <field name="name">cash.transfer.form</field>
+        <field name="model">cash.transfer</field>
+        <field name="arch" type="xml">
+            <form string="Cash Transfer">
+                <sheet>
+                    <header>
+                        <button name="action_transfer" type="object" string="Transfer" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </header>
+                    <group>
+                        <group string="Source Branch">
+                            <field name="source_company_id" required="1"/>
+                            <field name="source_journal_id" required="1"/>
+                        </group>
+                        <group string="Destination Branch">
+                            <field name="dest_company_id" required="1"/>
+                            <field name="dest_journal_id" required="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        <field name="transfer_date"/>
+                        <field name="label"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- 1. تعريف الـ Action أولًا (ضروري جدًا) -->
+    <record id="action_cash_transfer" model="ir.actions.act_window">
+        <field name="name">Cash Transfer</field>
+        <field name="res_model">cash.transfer</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="view_cash_transfer_form"/>
+    </record>
+    <!-- 3. القائمة (مع تحديد الـ External ID الكامل) -->
+    <menuitem
+            id="menu_cash_transfer"
+            name="Transfer Money"
+            parent="account.menu_finance_entries"
+            action="action_cash_transfer"
+            sequence="10"/>
+</odoo>
