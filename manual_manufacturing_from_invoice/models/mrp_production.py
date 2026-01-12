@@ -5,6 +5,8 @@ _logger = logging.getLogger(__name__)
 
 class Manufacturing(models.Model):
     _inherit = 'mrp.production'
+    ManufacturingNote = fields.Text('Manufacturing Note' , readonly=True)
+    BranchFile = fields.Binary('Files', readonly=True)
 
     product_id = fields.Many2one(
         'product.product',

@@ -13,7 +13,6 @@
         'views/account_move_views.xml',
         'views/installment_views.xml',
         'data/cron_data.xml',
-        'views/report_invoice_templates.xml',
 
     ],
 

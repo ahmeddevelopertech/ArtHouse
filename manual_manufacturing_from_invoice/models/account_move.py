@@ -8,7 +8,9 @@ _logger = logging.getLogger(__name__)
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
-    # delivery_date = fields.Date(required="move_type in ('out_invoice', 'out_refund')")
+    ManufacturingNote = fields.Text('Manufacturing Note')
+    Files = fields.Binary('Files' )
+
     manufacturing_status = fields.Selection(
         [('draft', 'Draft'), ('sent_to_manufacturing', 'Sent to Manufacturing')],
         string='Manufacturing Status',
@@ -66,6 +68,8 @@ class AccountMove(models.Model):
                 'company_id': invoice.company_id.id,
                 'date_start': invoice.delivery_date,
                 'procurement_group_id': procurement_group.id,
+                'BranchFile': invoice.Files,
+                'ManufacturingNote': invoice.ManufacturingNote+" "+line.name,
                 'location_src_id': self.env['stock.location']
                 .search([('usage', '=', 'internal'), ('company_id', '=', invoice.company_id.id)], limit=1).id,
                 'location_dest_id': self.env['stock.location']
@@ -95,5 +99,5 @@ class AccountMove(models.Model):
     @api.constrains('delivery_date', 'move_type')
     def _check_delivery_date(self):
         for record in self:
-            if record.move_type in ['out_invoice', 'out_refund'] and not record.delivery_date:
+            if record.move_type in ['out_invoice'] and not record.delivery_date:
                 raise ValidationError("Delivery date is required for customer invoices and refunds")

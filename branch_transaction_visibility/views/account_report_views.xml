@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- تعديل شاشة العميل لإضافة زر لفتح تقرير دفتر الأستاذ -->
     <record id="view_partner_form_inherit_ledger_button" model="ir.ui.view">
         <field name="name">res.partner.form.inherit.ledger.button</field>
         <field name="model">res.partner</field>

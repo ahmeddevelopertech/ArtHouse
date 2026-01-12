@@ -1,0 +1,584 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Robust inheritance: only swap the called template -->
+    <template id="report_invoice" inherit_id="account.report_invoice">
+        <xpath expr="//t[@t-call='account.report_invoice_document']" position="attributes">
+            <attribute name="t-call">modern_invoice_contract.report_invoice_document_router</attribute>
+        </xpath>
+    </template>
+
+    <!-- Router: apply modern layout only for customer invoices/credit notes -->
+    <template id="report_invoice_document_router">
+        <t t-if="o.move_type in ('out_invoice', 'out_refund')"
+           t-call="modern_invoice_contract.report_invoice_document"
+           t-lang="lang"/>
+        <t t-else=""
+           t-call="account.report_invoice_document"
+           t-lang="lang"/>
+    </template>
+
+    <!-- Modern Contract-Style Invoice -->
+    <template id="report_invoice_document">
+        <t t-call="web.external_layout">
+            <t t-set="o" t-value="o.with_context(lang=lang)"/>
+            <t t-set="partner" t-value="o.partner_id"/>
+            <t t-set="company" t-value="o.company_id"/>
+
+            <div t-attf-class="page o_contract_invoice #{'o_rtl' if (lang and lang.startswith('ar')) else ''}">
+                <style>
+                    .o_contract_invoice { font-size: 12px; }
+                    .o_contract_invoice.o_rtl { direction: rtl; }
+
+                    .o_contract_invoice .o_box {
+                    border: 1px solid #e6e6e6;
+                    border-radius: 10px;
+                    padding: 12px 14px;
+                    margin-bottom: 12px;
+                    background: #fff;
+                    }
+                    .o_contract_invoice .o_section_title {
+                    font-size: 13px;
+                    font-weight: 700;
+                    margin: 0 0 10px 0;
+                    }
+
+                    .o_contract_invoice .o_header_tbl { width: 100%; border-collapse: collapse; }
+                    .o_contract_invoice .o_header_tbl td { vertical-align: middle; }
+                    .o_contract_invoice .o_logo { max-height: 54px; }
+                    .o_contract_invoice .o_doc_title { font-size: 20px; font-weight: 800; margin: 0; }
+                    .o_contract_invoice .o_doc_sub { font-size: 12px; margin-top: 4px; }
+
+                    .o_contract_invoice .o_kv_tbl { width: 100%; border-collapse: collapse; table-layout: fixed; }
+                    .o_contract_invoice .o_kv_tbl td { padding: 4px 0; vertical-align: top; }
+                    .o_contract_invoice .o_lbl { width: 34%; font-weight: 700; }
+
+                    /* show dotted line ONLY when empty */
+                    .o_contract_invoice .o_val_line{
+                    display: block;
+                    width: 100%;
+                    min-height: 16px;
+                    line-height: 16px;
+                    padding-bottom: 2px;
+                    }
+                    .o_contract_invoice .o_val_empty{ border-bottom: 1px dotted #555; }
+                    .o_contract_invoice .o_val_filled{ border-bottom: none; }
+
+                    .o_contract_invoice table.o_lines { width: 100%; border-collapse: collapse; }
+                    .o_contract_invoice table.o_lines thead th {
+                    background: #faf9f5;
+                    color:#fff;
+                    font-weight: 700;
+                    padding: 8px;
+                    font-size: 11px;
+                    border: 1px solid #111827;
+                    }
+                    .o_contract_invoice table.o_lines tbody td {
+                    padding: 8px;
+                    border: 1px solid #e6e6e6;
+                    vertical-align: top;
+                    }
+                    .o_contract_invoice .o_lines .o_section td { background: #f3f4f6; font-weight: 700; }
+                    .o_contract_invoice .o_lines .o_note td { background: #fcfcfc; font-style: italic; }
+
+                    .o_contract_invoice .o_totals_tbl { width: 100%; border-collapse: collapse; }
+                    .o_contract_invoice .o_totals_tbl td { padding: 5px 0; }
+                    .o_contract_invoice .o_totals_tbl .o_grand td {
+                    font-weight: 800;
+                    font-size: 13px;
+                    border-top: 1px solid #e6e6e6;
+                    padding-top: 8px;
+                    }
+
+                    .o_contract_invoice .o_sign_tbl { width: 100%; border-collapse: collapse; }
+                    .o_contract_invoice .o_sign_tbl td {
+                    width: 50%;
+                    border: 1px dashed #bdbdbd;
+                    border-radius: 10px;
+                    padding: 10px 12px;
+                    vertical-align: top;
+                    }
+                    .o_contract_invoice .o_sign_title { font-weight: 700; margin-bottom: 6px; }
+                </style>
+
+                <!-- Header -->
+                <div class="o_box">
+                    <table class="o_header_tbl text-center">
+                        <tr>
+                            <td style="width: 18%;">
+                                <!-- IMPORTANT: do NOT use getattr() in QWeb -->
+                                <t t-set="logo_bin"
+                                   t-value="company.logo or (company.logo_web if 'logo_web' in company._fields else False)"/>
+                                <t t-if="logo_bin">
+                                    <img class="o_logo" t-att-src="image_data_uri(logo_bin)" alt="Logo"/>
+                                </t>
+                            </td>
+
+                            <td style="width: 52%;">
+                                <div class="o_doc_title">فاتورة / عقد</div>
+                                <div class="o_doc_sub">
+                                    <span>رقم الفاتورة:</span>
+                                    <t t-if="o.name">
+                                        <strong>
+                                            <span class="o_val_line o_val_filled">
+                                                <t t-esc="o.name"/>
+                                            </span>
+                                        </strong>
+                                    </t>
+                                    <t t-else="">
+                                        <strong>
+                                            <span class="o_val_line o_val_empty">&#160;</span>
+                                        </strong>
+                                    </t>
+                                </div>
+                            </td>
+
+                            <td style="width: 30%;">
+                                <table class="o_kv_tbl">
+                                    <tr>
+                                        <td class="o_lbl">تاريخ الفاتورة:</td>
+                                        <td>
+                                            <t t-if="o.invoice_date">
+                                                <span class="o_val_line o_val_filled">
+                                                    <span t-field="o.invoice_date"/>
+                                                </span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="o_val_line o_val_empty">&#160;</span>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="o_lbl">تاريخ الاستلام:</td>
+                                        <td>
+                                            <t t-if="o.delivery_date">
+                                                <span class="o_val_line o_val_filled">
+                                                    <span t-field="o.delivery_date"/>
+                                                </span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="o_val_line o_val_empty">&#160;</span>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="o_lbl">المرجع:</td>
+                                        <td>
+                                            <t t-if="o.ref">
+                                                <span class="o_val_line o_val_filled">
+                                                    <t t-esc="o.ref"/>
+                                                </span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="o_val_line o_val_empty">&#160;</span>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Customer / Company Info -->
+                <div class="row">
+                    <div class="col-6">
+                        <div class="o_box">
+                            <div class="o_section_title text-center">بيانات العميل</div>
+                            <table class="o_kv_tbl text-center">
+                                <tr>
+                                    <td class="o_lbl">الاسم:</td>
+                                    <td>
+                                        <t t-if="partner.name">
+                                            <span class="o_val_line o_val_filled">
+                                                <t t-esc="partner.name"/>
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="o_val_line o_val_empty">&#160;</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="o_lbl">كود العميل:</td>
+                                    <td>
+                                        <t t-if="partner.ref">
+                                            <span class="o_val_line o_val_filled">
+                                                <t t-esc="partner.ref"/>
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="o_val_line o_val_empty">&#160;</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="o_lbl">رقم ضريبي:</td>
+                                    <td>
+                                        <t t-if="partner.vat">
+                                            <span class="o_val_line o_val_filled">
+                                                <t t-esc="partner.vat"/>
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="o_val_line o_val_empty">&#160;</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="o_lbl">موبايل:</td>
+                                    <td>
+                                        <t t-if="partner.mobile">
+                                            <span class="o_val_line o_val_filled">
+                                                <t t-esc="partner.mobile"/>
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="o_val_line o_val_empty">&#160;</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="o_lbl">هاتف:</td>
+                                    <td>
+                                        <t t-if="partner.phone">
+                                            <span class="o_val_line o_val_filled">
+                                                <t t-esc="partner.phone"/>
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="o_val_line o_val_empty">&#160;</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="o_lbl">البريد:</td>
+                                    <td>
+                                        <t t-if="partner.email">
+                                            <span class="o_val_line o_val_filled">
+                                                <t t-esc="partner.email"/>
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="o_val_line o_val_empty">&#160;</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="o_lbl">العنوان:</td>
+                                    <td>
+                                        <t t-if="partner.contact_address">
+                                            <span class="o_val_line o_val_filled">
+                                                <t t-esc="(partner.contact_address or '').replace('\n', ' ')"/>
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="o_val_line o_val_empty">&#160;</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="o_box">
+                            <div class="o_section_title text-center">بيانات الشركة</div>
+                            <table class="o_kv_tbl text-center">
+                                <tr>
+                                    <td class="o_lbl">الاسم:</td>
+                                    <td>
+                                        <t t-if="company.name">
+                                            <span class="o_val_line o_val_filled">
+                                                <t t-esc="company.name"/>
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="o_val_line o_val_empty">&#160;</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="o_lbl">الرقم الضريبي:</td>
+                                    <td>
+                                        <t t-if="company.vat">
+                                            <span class="o_val_line o_val_filled">
+                                                <t t-esc="company.vat"/>
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="o_val_line o_val_empty">&#160;</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="o_lbl">هاتف:</td>
+                                    <td>
+                                        <t t-if="company.phone">
+                                            <span class="o_val_line o_val_filled">
+                                                <t t-esc="company.phone"/>
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="o_val_line o_val_empty">&#160;</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="o_lbl">البريد:</td>
+                                    <td>
+                                        <t t-if="company.email">
+                                            <span class="o_val_line o_val_filled">
+                                                <t t-esc="company.email"/>
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="o_val_line o_val_empty">&#160;</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="o_lbl">مندوب المبيعات:</td>
+                                    <td>
+                                        <t t-if="o.invoice_user_id">
+                                            <span class="o_val_line o_val_filled">
+                                                <t t-esc="o.invoice_user_id.name"/>
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="o_val_line o_val_empty">&#160;</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="o_lbl">شروط الدفع:</td>
+                                    <td>
+                                        <t t-if="o.invoice_payment_term_id">
+                                            <span class="o_val_line o_val_filled">
+                                                <t t-esc="o.invoice_payment_term_id.name"/>
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="o_val_line o_val_empty">&#160;</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lines -->
+                <div class="o_box">
+                    <div class="o_section_title">بنود الفاتورة</div>
+
+                    <table class="o_lines">
+                        <thead>
+                            <tr>
+                                <th style="width:40px;" class="text-center">#</th>
+                                <th style="width:180px;">اسم المنتج</th>
+                                <th>الوصف</th>
+                                <th style="width:70px;" class="text-end">الكمية</th>
+                                <th style="width:90px;" class="text-end">سعر الوحدة</th>
+                                <th style="width:60px;" class="text-end">خصم%</th>
+                                <th style="width:120px;">الضرائب</th>
+                                <th style="width:110px;" class="text-end">الإجمالي</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Robust lines source: prefer invoice_line_ids, fallback to line_ids -->
+                            <t t-set="lines"
+                               t-value="(o.invoice_line_ids or o.line_ids.filtered_domain([('exclude_from_invoice_tab','=',False)])).sorted('sequence')"/>
+                            <t t-set="idx" t-value="0"/>
+
+                            <t t-foreach="lines" t-as="line">
+                                <t t-if="line.display_type not in ('line_section','line_note')">
+                                    <t t-set="idx" t-value="idx + 1"/>
+                                    <tr>
+                                        <td class="text-center">
+                                            <t t-esc="idx"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="line.product_id.display_name or '—'"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.name"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-field="line.quantity"/>
+                                            <t t-if="line.product_uom_id">
+                                                <span></span>
+                                                <span t-esc="line.product_uom_id.name"/>
+                                            </t>
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-field="line.price_unit"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-field="line.discount"/>
+                                        </td>
+                                        <td>
+                                            <t t-esc="', '.join(line.tax_ids.mapped('name')) if line.tax_ids else ''"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-field="line.price_subtotal"/>
+                                        </td>
+                                    </tr>
+                                </t>
+
+                                <t t-elif="line.display_type == 'line_section'">
+                                    <tr class="o_section">
+                                        <td colspan="8">
+                                            <strong>
+                                                <span t-field="line.name"/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </t>
+
+                                <t t-elif="line.display_type == 'line_note'">
+                                    <tr class="o_note">
+                                        <td colspan="8">
+                                            <span t-field="line.name"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </t>
+
+                            <t t-if="idx == 0">
+                                <tr>
+                                    <td colspan="8" class="text-center">لا توجد بنود على الفاتورة</td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <!-- Totals -->
+                    <div class="row mt-3">
+                        <div class="col-6">
+                            <t t-if="o.currency_id">
+                                <div class="o_section_title" style="margin-bottom:6px;">المبلغ كتابةً</div>
+                                <div>
+                                    <span t-esc="o.currency_id.amount_to_text(o.amount_total) if o.amount_total is not None else ''"/>
+                                </div>
+                            </t>
+                        </div>
+                        <div class="col-6">
+                            <table class="o_totals_tbl text-center">
+                                <tr>
+                                    <td>الإجمالي قبل الضريبة</td>
+                                    <td class="text-end">
+                                        <span t-field="o.amount_untaxed"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>الضرائب</td>
+                                    <td class="text-end">
+                                        <span t-field="o.amount_tax"/>
+                                    </td>
+                                </tr>
+                                <tr class="o_grand">
+                                    <td>الإجمالي النهائي</td>
+                                    <td class="text-end">
+                                        <span t-field="o.amount_total"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>المتبقي</td>
+                                    <td class="text-end">
+                                        <span t-field="o.amount_residual"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Installments (ONLY if exists) -->
+                <t t-set="installments" t-value="o._get_contract_installments()"/>
+                <t t-if="installments">
+                    <div class="o_box">
+                        <div class="o_section_title">جدول الأقساط</div>
+
+                        <table class="o_lines">
+                            <thead>
+                                <tr>
+                                    <th style="width:50px;" class="text-center">#</th>
+                                    <th>القسط</th>
+                                    <th style="width:140px;">تاريخ الاستحقاق</th>
+                                    <th style="width:160px;" class="text-end">المبلغ</th>
+                                    <th style="width:120px;">الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="ii" t-value="0"/>
+                                <t t-foreach="installments" t-as="inst">
+                                    <t t-set="ii" t-value="ii + 1"/>
+                                    <tr>
+                                        <td class="text-center">
+                                            <t t-esc="ii"/>
+                                        </td>
+                                        <td>
+                                            <t t-esc="inst.get('name') or ''"/>
+                                        </td>
+                                        <td>
+                                            <t t-esc="inst.get('date') or ''"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="inst.get('amount_formatted') or ''"/>
+                                        </td>
+                                        <td>
+                                            <t t-esc="inst.get('state') or ''"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+
+                <!-- Notes / Terms -->
+                <t t-if="o.narration">
+                    <div class="o_box">
+                        <div class="o_section_title">الشروط / الملاحظات</div>
+                        <div>
+                            <span t-field="o.narration"/>
+                        </div>
+                    </div>
+                </t>
+
+                <!-- Signatures -->
+                <table class="o_sign_tbl" style="margin-top: 12px;">
+                    <tr>
+                        <td style="border-right: none;">
+                            <div class="o_sign_title">توقيع العميل</div>
+                            <div>الاسم:
+                                <span class="o_val_line o_val_empty">&#160;</span>
+                            </div>
+                            <div>التوقيع:
+                                <span class="o_val_line o_val_empty">&#160;</span>
+                            </div>
+                            <div>التاريخ:
+                                <span class="o_val_line o_val_empty">&#160;</span>
+                            </div>
+                        </td>
+                        <td style="border-left: none;">
+                            <div class="o_sign_title">توقيع الشركة</div>
+                            <div>الاسم:
+                                <span class="o_val_line o_val_empty">&#160;</span>
+                            </div>
+                            <div>التوقيع:
+                                <span class="o_val_line o_val_empty">&#160;</span>
+                            </div>
+                            <div>التاريخ:
+                                <span class="o_val_line o_val_empty">&#160;</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        </t>
+    </template>
+
+</odoo>
