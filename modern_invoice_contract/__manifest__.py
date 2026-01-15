@@ -1,14 +1,15 @@
+# -*- coding: utf-8 -*-
 {
-    "name": "Modern Invoice Contract Report",
-    "version": "17.0.1.0.6",
+    "name": "Modern Invoice Contract - Arthouse Layout",
+    "version": "17.0.0.1.0",
     "category": "Accounting/Reporting",
-    "summary": "Modern contract-style invoice PDF with clear labels, robust logo rendering, product name column, and optional installments section.",
-    "author": "Your Company",
+    "summary": "Invoice/contract PDF layout matching Arthouse design (RTL) with discounts & payments, and optional installments.",
     "license": "LGPL-3",
+    "author": "Arthouse",
     "depends": ["account", "web"],
     "data": [
-        "report/report_invoice.xml"
+        "report/report_invoice.xml",
     ],
     "installable": True,
-    "application": False
+    "application": False,
 }
