@@ -1,21 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
     <template id="report_invoice" inherit_id="account.report_invoice">
         <xpath expr="//t[@t-call='account.report_invoice_document']" position="attributes">
             <attribute name="t-call">modern_invoice_contract.report_invoice_document_router</attribute>
         </xpath>
     </template>
-
     <template id="report_invoice_document_router">
-        <t t-if="o.move_type in ('out_invoice', 'out_refund')"
-           t-call="modern_invoice_contract.report_invoice_document"
+        <t t-if="o.move_type in ('out_invoice', 'out_refund')" t-call="modern_invoice_contract.report_invoice_document"
            t-lang="lang"/>
-        <t t-else=""
-           t-call="account.report_invoice_document"
-           t-lang="lang"/>
+        <t t-else="" t-call="account.report_invoice_document" t-lang="lang"/>
     </template>
-
     <template id="report_invoice_document">
         <t t-call="web.external_layout">
             <t t-set="o" t-value="o.with_context(lang='ar')"/>
@@ -24,176 +17,93 @@
             <t t-set="ldata" t-value="o._get_contract_lines()"/>
             <t t-set="tot" t-value="o._get_contract_totals()"/>
             <t t-set="brand" t-value="o._get_company_branding_payload()"/>
-
             <div class="page o_arthouse_contract">
-                <style>
-                    @page { size: A4; margin: 9mm 10mm 9mm 10mm; }
-
-                    .o_arthouse_contract {
-                    direction: rtl;
-                    font-size: 12px;
-                    color: #111;
-                    font-family: "Noto Kufi Arabic","Noto Naskh Arabic","Cairo","DejaVu
-                    Sans","Tahoma","Arial",sans-serif;
-                    line-height: 1.55;
-                    border-top: 1px dashed #bcbcbc;
-                    padding-top: 8px;
-                    text-align: center;
-                    position: relative;
-                    }
-
-                    .o_arthouse_contract .ltr-num {
-                    direction: ltr;
-                    unicode-bidi: bidi-override;
-                    display: inline-block;
-                    text-align: center;
-                    }
-
-                    .o_arthouse_contract .ah_watermark {
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%) rotate(-15deg);
-                    opacity: 0.06;
-                    z-index: 0;
-                    width: 70%;
-                    text-align: center;
-                    pointer-events: none;
-                    }
-                    .o_arthouse_contract .ah_watermark img { max-width: 100%; height: auto; }
-                    .o_arthouse_contract .ah_content { z-index: 2; height:100%;}
-
-                    .o_arthouse_contract .h_tbl { width: 100%; border-collapse: collapse; }
-                    .o_arthouse_contract .h_tbl td { vertical-align: middle; }
-
-                    .o_arthouse_contract .logo { max-height: 55px; max-width: 100%; height: auto; display: inline-block;
-                    }
-                    .o_arthouse_contract .brand_block { margin-top: 6px; line-height: 1.25; }
-
-                    .o_arthouse_contract .hotline_txt { color: #D61A2A; font-weight: 800; }
-                    .o_arthouse_contract .hotline_num { color: #D61A2A; font-weight: 900; font-size: 22px;
-                    direction:ltr; unicode-bidi:bidi-override; display:inline-block; }
-
-                    .o_arthouse_contract .company_name { font-weight: 800; font-size: 14px; }
-                    .o_arthouse_contract .doc_title { font-weight: 900; font-size: 20px; margin-bottom: 2px; }
-                    .o_arthouse_contract .doc_code { font-weight: 600; font-size: 10px; margin-bottom: 4px;}
-
-                    .o_arthouse_contract .branch_block { font-weight: 800; line-height: 1.15; }
-
-                    .o_arthouse_contract .info_tbl {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-top: 12px;
-                    border: 1px solid #e6e6e6;
-                    padding: 10px 12px;
-                    }
-                    .o_arthouse_contract .info_tbl td { padding: 6px 0; vertical-align: middle; }
-                    .o_arthouse_contract .lbl { width: 160px; font-weight: 800; text-align: center; }
-                    .o_arthouse_contract .val { text-align: center; }
-
-                    .o_arthouse_contract table.lines {
-                    width: 100%;
-                    border-collapse: collapse;
-                    table-layout: fixed;
-                    margin-top: 14px;
-                    }
-                    .o_arthouse_contract table.lines th,
-                    .o_arthouse_contract table.lines td {
-                    border: 1px solid #4b4b4b;
-                    padding: 9px 10px;
-                    vertical-align: middle;
-                    line-height: 1.5;
-                    overflow-wrap: anywhere;
-                    word-break: break-word;
-                    text-align: center;
-                    }
-                    .o_arthouse_contract table.lines thead th {
-                    background: #d9d9d9;
-                    font-weight: 900;
-                    text-align: center;
-                    }
-
-                    .o_arthouse_contract .section_row td { background: #f3f3f3; font-weight: 900; }
-                    .o_arthouse_contract .note_row td { background: #fbfbfb; color: #444; }
-
-                    .o_arthouse_contract .totals_wrap { width: 100%; margin-top: 16px; }
-                    .o_arthouse_contract .totals_outer { width: 100%; border-collapse: collapse; }
-                    .o_arthouse_contract .totals_outer td { vertical-align: top; padding: 0 6px; }
-
-                    .o_arthouse_contract .tot_box {
-                    width: 100%;
-                    border: 1px solid #e6e6e6;
-                    padding: 10px 12px;
-                    }
-                    .o_arthouse_contract .tot_tbl { width: 100%; border-collapse: collapse; }
-                    .o_arthouse_contract .tot_tbl td { padding: 6px 0; vertical-align: middle; text-align: center;
-                    line-height: 1.5; }
-                    .o_arthouse_contract .tot_lbl { font-weight: 900; text-align: center; }
-                    .o_arthouse_contract .tot_val { text-align: center; }
+                <style>@page { size: A4; margin: 9mm 10mm 9mm 10mm; } .o_arthouse_contract { direction: rtl; font-size:
+                    12px; color: #111; font-family: "Noto Kufi Arabic","Noto Naskh Arabic","Cairo","DejaVu
+                    Sans","Tahoma","Arial",sans-serif; line-height: 1.55; padding-top:
+                    0px; text-align: center; position: relative; } .o_arthouse_contract .ltr-num { direction: ltr;
+                    unicode-bidi: bidi-override; display: inline-block; text-align: center; } .o_arthouse_contract
+                    .ah_watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%)
+                    rotate(-15deg); opacity: 0.06; z-index: 0; width: 70%; text-align: center; pointer-events: none; }
+                    .o_arthouse_contract .ah_watermark img { max-width: 100%; height: auto; } .o_arthouse_contract
+                    .ah_content { z-index: 2; height:100%;} .o_arthouse_contract .h_tbl { width: 100%; border-collapse:
+                    collapse; } .o_arthouse_contract .h_tbl td { vertical-align: middle; } .o_arthouse_contract .logo {
+                    max-height: 55px; max-width: 100%; height: auto; display: inline-block; } .o_arthouse_contract
+                    .brand_block { margin-top: 6px; line-height: 1.25; } .o_arthouse_contract .hotline_txt { color:
+                    #D61A2A; font-weight: 800; } .o_arthouse_contract .hotline_num { color: #D61A2A; font-weight: 900;
+                    font-size: 22px; direction:ltr; unicode-bidi:bidi-override; display:inline-block; }
+                    .o_arthouse_contract .company_name { font-weight: 800; font-size: 14px; } .o_arthouse_contract
+                    .doc_title { font-weight: 900; font-size: 20px; margin-bottom: 2px; } .o_arthouse_contract .doc_code
+                    { font-weight: 600; font-size: 10px; margin-bottom: 4px;} .o_arthouse_contract .branch_block {
+                    font-weight: 800; line-height: 1.15; } .o_arthouse_contract .info_tbl { width: 100%;
+                    border-collapse: collapse; margin-top: 12px; border: 0 solid #e6e6e6; padding: 10px 12px; }
+                    .o_arthouse_contract .info_tbl td { padding: 6px 0; vertical-align: middle; } .o_arthouse_contract
+                    .lbl { width: 160px; font-weight: 800; text-align: center; } .o_arthouse_contract .val { text-align:
+                    center; } .o_arthouse_contract table.lines { width: 100%; border-collapse: collapse; table-layout:
+                    fixed; margin-top: 14px; } .o_arthouse_contract table.lines th, .o_arthouse_contract table.lines td
+                    { border: 1px solid #4b4b4b; padding: 9px 10px; vertical-align: middle; line-height: 1.5;
+                    overflow-wrap: anywhere; word-break: break-word; text-align: center; } .o_arthouse_contract
+                    table.lines thead th { background: #d9d9d9; font-weight: 900; text-align: center; }
+                    .o_arthouse_contract .section_row td { background: #f3f3f3; font-weight: 900; } .o_arthouse_contract
+                    .note_row td { background: #fbfbfb; color: #444; } .o_arthouse_contract .totals_wrap { width: 100%;
+                    margin-top: 16px; } .o_arthouse_contract .totals_outer { width: 100%; border-collapse: collapse; }
+                    .o_arthouse_contract .totals_outer td { vertical-align: top; padding: 0 6px; } .o_arthouse_contract
+                    .tot_box { width: 100%; border: 1px solid #e6e6e6; padding: 10px 12px; } .o_arthouse_contract
+                    .tot_tbl { width: 100%; border-collapse: collapse; } .o_arthouse_contract .tot_tbl td { padding: 6px
+                    0; vertical-align: middle; text-align: center; line-height: 1.5; } .o_arthouse_contract .tot_lbl {
+                    font-weight: 900; text-align: center; } .o_arthouse_contract .tot_val { text-align: center; }
                     .o_arthouse_contract .tot_hr { border-top: 2px solid #4b4b4b; margin-top: 10px; }
-
                     .o_arthouse_contract .sign_tbl { width: 100%; border-collapse: collapse; margin-top: 14px; border:
-                    0.2px solid #4b4b4b; padding:5px , vertical-align: bottom;}
-                    .o_arthouse_contract .sign_tbl td {text-align: center; border: 0.5px solid #4b4b4b:vertical-align:
-                    bottom;}
-                    .o_arthouse_contract .sign_lbl { font-weight: 900; margin: 10px}
-                    .o_arthouse_contract .sign_line { border-top: 0px solid #4b4b4b; height: 16px; margin-top: 18px; }
-
-                    .o_arthouse_contract .footer_wrap {
-                    margin-top: 14px;
-                    border-top: 1px solid #e6e6e6;
-                    padding-top: 10px;
-                    text-align: center;
-                    }
-                    .o_arthouse_contract .footer_hotline {
-                    color: #D61A2A;
-                    font-weight: 900;
-                    font-size: 28px;
-                    opacity: .18;
-                    direction: ltr;
-                    unicode-bidi: bidi-override;
-                    display: inline-block;
-                    }
-                    .o_arthouse_contract .footer_txt {
-                    font-size: 11px;
-                    line-height: 1.4;
-                    text-align: center;
-                    direction: rtl;
-                    margin-top: 6px;
-                    }
-                    .o_arthouse_contract .ah_signatures {
-                    width: 100%;
-                    border: 0.2px solid #4b4b4b;
-                    padding: 10px 8px;
-                    page-break-inside: avoid;
-                    margin-top: 25px;
-                    }
-                    .o_arthouse_contract .ah_sig_row { display: table; width: 100%; table-layout: fixed;
-                    border-collapse: collapse; }
-                    .o_arthouse_contract .ah_sig_cell { display: table-cell; width: 25%; vertical-align: top; padding:
-                    6px 6px; border-left: 0.2px solid #4b4b4b; }
-                    .o_arthouse_contract .ah_sig_cell:first-child { border-left: 0; }
-                    .o_arthouse_contract .ah_sig_label { font-weight: 900; margin-bottom: 14px; }
-                    .o_arthouse_contract .ah_sig_line { border-top: 1px solid #4b4b4b; height: 22px; margin-top: 18px; }
+                    0.2px solid #4b4b4b; padding:5px , vertical-align: bottom;} .o_arthouse_contract .sign_tbl td
+                    {text-align: center; border: 0.5px solid #4b4b4b:vertical-align: bottom;} .o_arthouse_contract
+                    .sign_lbl { font-weight: 900; margin: 10px} .o_arthouse_contract .sign_line { border-top: 0px solid
+                    #4b4b4b; height: 16px; margin-top: 18px; } .o_arthouse_contract .footer_wrap { margin-top: 14px;
+                    border-top: 1px solid #e6e6e6; padding-top: 10px; text-align: center; } .o_arthouse_contract
+                    .footer_hotline { color: #D61A2A; font-weight: 900; font-size: 28px; opacity: .18; direction: ltr;
+                    unicode-bidi: bidi-override; display: inline-block; } .o_arthouse_contract .footer_txt { font-size:
+                    11px; line-height: 1.4; text-align: center; direction: rtl; margin-top: 6px; } .o_arthouse_contract
+                    .ah_signatures { width: 100%; border: 0.2px solid #4b4b4b; padding: 10px 8px; page-break-inside:
+                    avoid; margin-top: 25px; } .o_arthouse_contract .ah_sig_row { display: table; width: 100%;
+                    table-layout: fixed; border-collapse: collapse; } .o_arthouse_contract .ah_sig_cell { display:
+                    table-cell; width: 25%; vertical-align: top; padding: 6px 6px; border-left: 0.2px solid #4b4b4b; }
+                    .o_arthouse_contract .ah_sig_cell:first-child { border-left: 0; } .o_arthouse_contract .ah_sig_label
+                    { font-weight: 900; margin-bottom: 14px; } .o_arthouse_contract .ah_sig_line { border-top: 1px solid
+                    #4b4b4b; height: 22px; margin-top: 18px; } /* === Scoped overrides for Arthouse Contract only (PDF)
+                    === */ /* (1) Reduce blank space under external_layout header for this page only */
+                    .o_report_layout_standard .article .page.o_arthouse_contract { margin-top: -50mm !important;
+                    padding-top: 3mm !important; /* keep ~5-10mm visible gap under header */ } /* (2) Remove all borders
+                    from customer info table */ .o_arthouse_contract .info_tbl, .o_arthouse_contract .info_tbl tr,
+                    .o_arthouse_contract .info_tbl td, .o_arthouse_contract .info_tbl th { border: 0 !important;
+                    border-top: 0 !important; border-right: 0 !important; border-bottom: 0 !important; border-left: 0
+                    !important; outline: 0 !important; } /* (3) Right-align customer info only (keep rest of report
+                    centered) */ .o_arthouse_contract .info_tbl { direction: rtl !important; text-align: right
+                    !important; margin-left: auto !important; margin-right: 0 !important; } .o_arthouse_contract
+                    .info_tbl td.lbl, .o_arthouse_contract .info_tbl td.val { text-align: right !important; }
+                    .o_arthouse_contract .info_tbl td.lbl:after { content: " :" !important; } /* === Arthouse Contract
+                    scoped overrides (PDF) === */ /* (2) Reduce blank space under external_layout header for this report
+                    only */ .o_report_layout_standard .article .page.o_arthouse_contract { margin-top: -40mm !important;
+                    padding-top: 10mm !important; /* keep ~5-10mm gap under header */ } .o_arthouse_contract .doc_title
+                    { margin-top: 0 !important; } /* (1) Remove customer info "box" (table + nearest wrapper) */ /*
+                    Nearest wrapper around info_tbl in this template: div.ah_content */ .o_arthouse_contract .ah_content
+                    { border: 0 !important; outline: 0 !important; box-shadow: none !important; background: transparent
+                    !important; background-color: transparent !important; border-radius: 0 !important; }
+                    .o_arthouse_contract .ah_content .info_tbl, .o_arthouse_contract .ah_content .info_tbl * { border: 0
+                    !important; outline: 0 !important; box-shadow: none !important; background: transparent !important;
+                    background-color: transparent !important; border-radius: 0 !important; }
                 </style>
-
-                <!--                <t t-if="brand['has_watermark']">-->
-                <!--                    <div class="ah_watermark">-->
-                <!--                        <img t-att-src="brand['watermark_src']" alt=""/>-->
-                <!--                    </div>-->
-                <!--                </t>-->
-
+                <!--                  <t t-if="brand['has_watermark']">  -->
+                <!--                      <div class="ah_watermark">  -->
+                <!--                          <img t-att-src="brand['watermark_src']" alt=""/>  -->
+                <!--                      </div>  -->
+                <!--                  </t>  -->
                 <div class="ah_content">
-
                     <div class="doc_title">استماره تعاقد</div>
                     <div class="doc_code">
-                        &#160;
                         <span class="ltr-num">
                             <t t-esc="hdr['contract_code']"/>
                         </span>
                     </div>
-
-                    <!-- Contract/Customer block -->
+                    <!--   Contract/Customer block   -->
                     <table class="info_tbl">
                         <tr>
                             <td class="lbl">تاريخ التعاقد</td>
@@ -202,21 +112,18 @@
                                     <t t-esc="hdr['contract_date']['raw']"/>
                                 </span>
                             </td>
-
                         </tr>
                         <tr>
                             <td class="lbl">اسم العميل</td>
                             <td class="val">
                                 <t t-esc="hdr['customer_name']"/>
                             </td>
-
                         </tr>
                         <tr>
                             <td class="lbl">العنوان</td>
                             <td class="val">
                                 <t t-esc="hdr['delivery_address']"/>
                             </td>
-
                         </tr>
                         <tr>
                             <td class="lbl">رقم الهاتف</td>
@@ -225,7 +132,6 @@
                                     <t t-esc="hdr['phone']"/>
                                 </span>
                             </td>
-
                         </tr>
                         <tr>
                             <td class="lbl">تاريخ التسليم</td>
@@ -234,32 +140,27 @@
                                     <t t-esc="hdr['delivery_date']['raw']"/>
                                 </span>
                             </td>
-
                         </tr>
                         <tr>
                             <td class="lbl">نوع التعاقد</td>
                             <td class="val">
                                 <t t-esc="hdr['contract_type']"/>
                             </td>
-
                         </tr>
                         <tr>
                             <td class="lbl">ملاحظات</td>
                             <td class="val">
                                 <t t-esc="hdr['notes']"/>
                             </td>
-
                         </tr>
                     </table>
-
-                    <!-- Lines -->
+                    <!--   Lines   -->
                     <table class="lines" style="direction: rtl;">
                         <thead>
                             <tr>
                                 <th style="width: 36px;">م</th>
                                 <th style="width: 140px;">اسم المنتج</th>
                                 <th>البيان</th>
-
                                 <th style="width: 50px;">العدد</th>
                                 <th style="width: 70px;">السعر</th>
                                 <th style="width: 70px;">الخصم</th>
@@ -296,7 +197,6 @@
                                         <td>
                                             <t t-esc="r['statement']"/>
                                         </td>
-
                                         <td>
                                             <span class="ltr-num">
                                                 <t t-esc="r['qty_formatted']"/>
@@ -325,7 +225,6 @@
                                     </tr>
                                 </t>
                             </t>
-
                             <t t-if="ldata['has_lines'] == False">
                                 <tr>
                                     <td colspan="8">لا توجد بنود</td>
@@ -333,80 +232,75 @@
                             </t>
                         </tbody>
                     </table>
-
-                    <!-- Totals (FIXED: from Python only) -->
+                    <!--   Totals (FIXED: from Python only)   -->
                     <div class="totals_wrap">
-                        <table class="totals_outer">
+                        <table class="info_tbl">
                             <tr>
-                                <td style="width: 100%;">
+                                <td class="width: 100%;">
                                     <div class="tot_box">
                                         <table class="tot_tbl">
                                             <tr>
-                                                <td class="tot_lbl">إجمالي التعاقد</td>
-                                                <td class="tot_val">
+                                                <td class="lbl">إجمالي التعاقد</td>
+                                                <td class="val">
                                                     <span class="ltr-num">
                                                         <t t-esc="tot['contract_total_formatted']"/>
                                                     </span>
                                                 </td>
-
                                             </tr>
                                             <tr>
-                                                <td class="tot_lbl">المدفوع</td>
-                                                <td class="tot_val">
+                                                <td class="lbl">المدفوع</td>
+                                                <td class="val">
                                                     <span class="ltr-num">
                                                         <t t-esc="tot['paid_formatted']"/>
                                                     </span>
                                                 </td>
-
                                             </tr>
                                             <tr>
-                                                <td class="tot_lbl">المتبقي</td>
-                                                <td class="tot_val">
+                                                <td class="lbl">المتبقي</td>
+                                                <td class="val">
                                                     <span class="ltr-num">
                                                         <t t-esc="tot['due_formatted']"/>
                                                     </span>
                                                 </td>
-
                                             </tr>
                                         </table>
                                     </div>
                                 </td>
-                                <!--                                <td style="width: 50%;">-->
-                                <!--                                    <div class="tot_box">-->
-                                <!--                                        <table class="tot_tbl">-->
-                                <!--                                            <tr>-->
-                                <!--                                                <td class="tot_val">-->
-                                <!--                                                    <span class="ltr-num">-->
-                                <!--                                                        <t t-esc="tot['gross_before_discount_formatted']"/>-->
-                                <!--                                                    </span>-->
-                                <!--                                                </td>-->
-                                <!--                                                <td class="tot_lbl">القيمة قبل الخصم</td>-->
-                                <!--                                            </tr>-->
-                                <!--                                            <tr>-->
-                                <!--                                                <td class="tot_val">-->
-                                <!--                                                    <span class="ltr-num">-->
-                                <!--                                                        <t t-esc="tot['discount_amount_total_formatted']"/>-->
-                                <!--                                                    </span>-->
-                                <!--                                                </td>-->
-                                <!--                                                <td class="tot_lbl">قيمة الخصم</td>-->
-                                <!--                                            </tr>-->
-                                <!--                                            <tr>-->
-                                <!--                                                <td class="tot_val">-->
-                                <!--                                                    <span class="ltr-num">-->
-                                <!--                                                        <t t-esc="tot['net_total_formatted']"/>-->
-                                <!--                                                    </span>-->
-                                <!--                                                </td>-->
-                                <!--                                                <td class="tot_lbl">الصافي</td>-->
-                                <!--                                            </tr>-->
-                                <!--                                        </table>-->
-                                <!--                                    </div>-->
-                                <!--                                </td>-->
+                                <!--                                  <td style="width: 50%;">  -->
+                                <!--                                      <div class="tot_box">  -->
+                                <!--                                          <table class="tot_tbl">  -->
+                                <!--                                              <tr>  -->
+                                <!--                                                  <td class="tot_val">  -->
+                                <!--                                                      <span class="ltr-num">  -->
+                                <!--                                                          <t t-esc="tot['gross_before_discount_formatted']"/>  -->
+                                <!--                                                      </span>  -->
+                                <!--                                                  </td>  -->
+                                <!--                                                  <td class="tot_lbl">القيمة قبل الخصم</td>  -->
+                                <!--                                              </tr>  -->
+                                <!--                                              <tr>  -->
+                                <!--                                                  <td class="tot_val">  -->
+                                <!--                                                      <span class="ltr-num">  -->
+                                <!--                                                          <t t-esc="tot['discount_amount_total_formatted']"/>  -->
+                                <!--                                                      </span>  -->
+                                <!--                                                  </td>  -->
+                                <!--                                                  <td class="tot_lbl">قيمة الخصم</td>  -->
+                                <!--                                              </tr>  -->
+                                <!--                                              <tr>  -->
+                                <!--                                                  <td class="tot_val">  -->
+                                <!--                                                      <span class="ltr-num">  -->
+                                <!--                                                          <t t-esc="tot['net_total_formatted']"/>  -->
+                                <!--                                                      </span>  -->
+                                <!--                                                  </td>  -->
+                                <!--                                                  <td class="tot_lbl">الصافي</td>  -->
+                                <!--                                              </tr>  -->
+                                <!--                                          </table>  -->
+                                <!--                                      </div>  -->
+                                <!--                                  </td>  -->
                             </tr>
                         </table>
-                        <div class="tot_hr"></div>
+                        <div class="tot_hr"/>
                     </div>
-
-                    <!-- Payments -->
+                    <!--   Payments   -->
                     <t t-set="payment_infos" t-value="o._get_contract_payment_infos()"/>
                     <t t-if="payment_infos">
                         <div style="margin-top: 10px;">
@@ -449,8 +343,7 @@
                             </table>
                         </div>
                     </t>
-
-                    <!-- Installments -->
+                    <!--   Installments   -->
                     <t t-set="installments" t-value="o._get_contract_installments()"/>
                     <t t-if="installments">
                         <div style="margin-top: 10px;">
@@ -493,34 +386,29 @@
                             </table>
                         </div>
                     </t>
-
-                    <!-- Signatures -->
-
-
+                    <!--   Signatures   -->
                 </div>
                 <div class="ah_signatures">
                     <div class="ah_sig_row">
                         <div class="ah_sig_cell">
                             <div class="ah_sig_label">مسؤول المبيعات</div>
-                            <div class="ah_sig_line"></div>
+                            <div class="ah_sig_line"/>
                         </div>
                         <div class="ah_sig_cell">
                             <div class="ah_sig_label">المدير</div>
-                            <div class="ah_sig_line"></div>
+                            <div class="ah_sig_line"/>
                         </div>
                         <div class="ah_sig_cell">
                             <div class="ah_sig_label">نائب المدير</div>
-                            <div class="ah_sig_line"></div>
+                            <div class="ah_sig_line"/>
                         </div>
                         <div class="ah_sig_cell">
                             <div class="ah_sig_label">توقيع العميل أو من ينوب عنه</div>
-                            <div class="ah_sig_line"></div>
+                            <div class="ah_sig_line"/>
                         </div>
                     </div>
                 </div>
-
             </div>
         </t>
     </template>
-
 </odoo>
