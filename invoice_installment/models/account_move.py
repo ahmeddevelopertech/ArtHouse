@@ -13,6 +13,7 @@ class AccountMove(models.Model):
     has_installments = fields.Boolean(
         string='Has Installments',
     )
+    Contract_Notes=fields.Text()
     installment_total = fields.Monetary(
         string='Installment Total',
         compute='_compute_installment_total',

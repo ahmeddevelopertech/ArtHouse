@@ -9,6 +9,7 @@
             <!-- Add installment section inside the notebook -->
             <field name="partner_shipping_id" position="after">
                 <field name="has_installments"/>
+                <field name="Contract_Notes"/>
             </field>
             <xpath expr="//notebook" position="inside">
                 <page string="Installments" invisible="not has_installments">

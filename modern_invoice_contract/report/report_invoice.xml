@@ -65,10 +65,10 @@
                     .ah_signatures { width: 100%; border: 0.2px solid #4b4b4b; padding: 10px 8px; page-break-inside:
                     avoid; margin-top: 25px; } .o_arthouse_contract .ah_sig_row { display: table; width: 100%;
                     table-layout: fixed; border-collapse: collapse; } .o_arthouse_contract .ah_sig_cell { display:
-                    table-cell; width: 25%; vertical-align: top; padding: 6px 6px; border-left: 0.2px solid #4b4b4b; }
-                    .o_arthouse_contract .ah_sig_cell:first-child { border-left: 0; } .o_arthouse_contract .ah_sig_label
+                    table-cell; width: 25%; vertical-align: top; padding: 6px 6px; border-left: 0; solid #4b4b4b; }
+                    .o_arthouse_contract .ah_sig_label
                     { font-weight: 900; margin-bottom: 14px; } .o_arthouse_contract .ah_sig_line { border-top: 1px solid
-                    #4b4b4b; height: 22px; margin-top: 18px; } /* === Scoped overrides for Arthouse Contract only (PDF)
+                    #4b4b4b; height: 22px; margin-top: 35px; } /* === Scoped overrides for Arthouse Contract only (PDF)
                     === */ /* (1) Reduce blank space under external_layout header for this page only */
                     .o_report_layout_standard .article .page.o_arthouse_contract { margin-top: -50mm !important;
                     padding-top: 3mm !important; /* keep ~5-10mm visible gap under header */ } /* (2) Remove all borders
@@ -139,12 +139,6 @@
                                 <span class="ltr-num">
                                     <t t-esc="hdr['delivery_date']['raw']"/>
                                 </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="lbl">نوع التعاقد</td>
-                            <td class="val">
-                                <t t-esc="hdr['contract_type']"/>
                             </td>
                         </tr>
                         <tr>
@@ -388,10 +382,12 @@
                     </t>
                     <!--   Signatures   -->
                 </div>
+
                 <div class="ah_signatures">
                     <div class="ah_sig_row">
                         <div class="ah_sig_cell">
                             <div class="ah_sig_label">مسؤول المبيعات</div>
+
                             <div class="ah_sig_line"/>
                         </div>
                         <div class="ah_sig_cell">
@@ -408,6 +404,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </t>
     </template>

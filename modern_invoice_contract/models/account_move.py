@@ -168,8 +168,7 @@ class AccountMove(models.Model):
 
         phone = partner.mobile or partner.phone or self._contract_placeholder()
 
-        notes = move.ref or move.narration or ""
-        notes = self._contract_truncate(notes, limit=220) or self._contract_placeholder()
+        notes = move.Contract_Notes or self._contract_placeholder()
 
         return {
             "contract_date": self._contract_format_date_dict(move.invoice_date),
