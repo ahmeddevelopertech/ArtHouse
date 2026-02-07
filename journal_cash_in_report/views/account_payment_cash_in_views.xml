@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Custom tree view for the report to clearly show each payment amount -->
+    <record id="view_account_payment_cash_in_tree" model="ir.ui.view">
+        <field name="name">account.payment.cash.in.tree</field>
+        <field name="model">account.payment</field>
+        <field name="arch" type="xml">
+            <tree string="Cash In Payments" create="false" edit="false" delete="false">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="ref" optional="show"/>
+                <field name="journal_id"/>
+                <field name="payment_method_line_id" optional="show"/>
+                <field name="currency_id" optional="show"/>
+                <field name="amount" sum="Total Amount"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Custom pivot view: default focuses on SUM(amount) per Journal -->
+    <record id="view_account_payment_cash_in_pivot" model="ir.ui.view">
+        <field name="name">account.payment.cash.in.pivot</field>
+        <field name="model">account.payment</field>
+        <field name="arch" type="xml">
+            <pivot string="Cash In by Journal">
+                <field name="journal_id" type="row"/>
+                <field name="amount" type="measure"/>
+                <field name="date" type="col" interval="month"/>
+            </pivot>
+        </field>
+    </record>
+</odoo>

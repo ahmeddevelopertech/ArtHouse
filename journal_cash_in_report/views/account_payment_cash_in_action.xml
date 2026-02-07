@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="action_cash_in_by_journal" model="ir.actions.act_window">
+        <field name="name">Cash In by Journal</field>
+        <field name="res_model">account.payment</field>
+
+        <field name="view_mode">tree,pivot,graph</field>
+        <!-- Force our custom views so Pivot starts with Amount measure available -->
+        <field name="views" eval="[
+            (ref('journal_cash_in_report.view_account_payment_cash_in_tree'), 'tree'),
+            (ref('journal_cash_in_report.view_account_payment_cash_in_pivot'), 'pivot'),
+            (False, 'graph')
+        ]"/>
+
+        <field name="domain">[('payment_type','=','inbound'), ('state','=','posted')]</field>
+
+        <!-- Default: group by journal + use Amount measure in pivot/graph -->
+        <field name="context">
+            {
+              'search_default_filter_cash_in_inbound': 1,
+              'search_default_filter_cash_in_posted': 1,
+              'search_default_grp_by_journal': 1,
+              'pivot_measures': ['amount'],
+              'graph_measure': 'amount'
+            }
+        </field>
+    </record>
+
+    <menuitem id="menu_cash_in_reports_root"
+              name="Cash In Reports"
+              parent="account.menu_finance_reports"
+              sequence="250"/>
+
+    <menuitem id="menu_cash_in_by_journal"
+              name="Cash In by Journal"
+              parent="journal_cash_in_report.menu_cash_in_reports_root"
+              action="journal_cash_in_report.action_cash_in_by_journal"
+              sequence="10"/>
+</odoo>

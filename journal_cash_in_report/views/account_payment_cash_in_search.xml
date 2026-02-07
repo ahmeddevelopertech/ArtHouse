@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Extend account.payment search view to add handy filters for the Cash In report -->
+    <record id="view_account_payment_search_inherit_cash_in" model="ir.ui.view">
+        <field name="name">account.payment.search.inherit.cash.in</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter string="Inbound (Cash In)" name="filter_cash_in_inbound"
+                        domain="[('payment_type','=','inbound')]"/>
+                <filter string="Posted Only" name="filter_cash_in_posted"
+                        domain="[('state','=','posted')]"/>
+                <separator/>
+                <filter string="Group by Journal" name="grp_by_journal"
+                        context="{'group_by':'journal_id'}"/>
+                <filter string="Group by Date" name="grp_by_date"
+                        context="{'group_by':'date'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
